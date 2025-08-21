@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LensCraft — Simple 3‑Tab Photography Site</title>
+  <!-- Tailwind CDN (no build step) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Carousel basics */
+    .carousel { position: relative; overflow: hidden; }
+    .carousel-track { position: relative; height: 100%; }
+    .carousel-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 600ms ease; }
+    .carousel-slide.active { opacity: 1; }
+    .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,.45); color: #fff; border-radius: 9999px; padding: .5rem .7rem; }
+    .carousel-btn:hover { background: rgba(0,0,0,.65); }
+    .carousel-btn.prev { left: .5rem; }
+    .carousel-btn.next { right: .5rem; }
+
+    /* Image hover zoom */
+    .zoom-card img { transition: transform .5s ease, filter .5s ease; }
+    .zoom-card:hover img { transform: scale(1.06); filter: saturate(1.05); }
+
+    /* Simple focus outline utility for clickable cards */
+    .focusable:focus { outline: 3px solid #60a5fa; outline-offset: 2px; }
+  </style>
+</head>
+<body class="bg-white text-slate-800">
+  <!--
+    =============================
+    ASSETS SETUP (LOCAL IMAGES)
+    -----------------------------
+    Put your photos in this structure next to index.html:
+
+    /assets/about.jpg
+    /assets/wedding/1.jpg ... 6.jpg
+    /assets/birthday/1.jpg ... 6.jpg
+    /assets/party/1.jpg ... 6.jpg
+    /assets/ceremony/1.jpg ... 6.jpg
+    /assets/friends/1.jpg ... 6.jpg
+
+    Replace file names below as you like.
+  -->
+
+  <!-- Header / Nav -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <div class="flex items-center gap-2">
+          <div class="h-9 w-9 rounded-lg bg-slate-900 text-white grid place-content-center font-bold">LC</div>
+          <span class="font-semibold">LensCraft</span>
+        </div>
+        <!-- Tabs -->
+        <nav class="hidden sm:flex items-center gap-1 text-sm">
+          <button data-route="home" class="px-4 py-2 rounded-lg hover:bg-slate-100" aria-label="Home">Home</button>
+          <button data-route="portfolio" class="px-4 py-2 rounded-lg hover:bg-slate-100" aria-label="Portfolio">Portfolio</button>
+          <button data-route="about" class="px-4 py-2 rounded-lg hover:bg-slate-100" aria-label="About">About</button>
+          <button data-route="contact" class="px-4 py-2 rounded-lg hover:bg-slate-100" aria-label="Contact">Contact</button>
+        </nav>
+        <!-- Mobile menu -->
+        <div class="sm:hidden">
+          <button id="menuBtn" class="px-3 py-2 rounded-lg border border-slate-300">Menu</button>
+        </div>
+      </div>
+      <!-- Mobile sheet -->
+      <div id="mobileMenu" class="hidden border-t border-slate-200 sm:hidden">
+        <div class="py-2 grid">
+          <button data-route="home" class="text-left px-3 py-2 hover:bg-slate-100">Home</button>
+          <button data-route="portfolio" class="text-left px-3 py-2 hover:bg-slate-100">Portfolio</button>
+          <button data-route="about" class="text-left px-3 py-2 hover:bg-slate-100">About</button>
+          <button data-route="contact" class="text-left px-3 py-2 hover:bg-slate-100">Contact</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- App container -->
+  <main id="app" class="min-h-[70vh]"></main>
+
+  <footer class="border-t border-slate-200 mt-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 text-sm text-slate-500 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+      <p>© <span id="year"></span> LensCraft. All rights reserved.</p>
+      <p>Built with HTML • CSS • JavaScript • Local images</p>
+    </div>
+  </footer>
+
+  <script>
+    // ---------- Data ----------
+    const CATS = [
+      { key: 'wedding',  label: 'Wedding Photos' },
+      { key: 'birthday', label: 'Birthday Photos' },
+      { key: 'party',    label: 'Party Photos' },
+      { key: 'ceremony', label: 'Ceremony Photos' },
+      { key: 'friends',  label: 'Friends Photos' },
+    ];
+
+    const CAT_IMAGES = {
+      wedding: [
+        'assets/wedding/1.jpg','assets/wedding/2.jpg','assets/wedding/3.jpg',
+        'assets/wedding/4.jpg','assets/wedding/5.jpg','assets/wedding/6.jpg',
+      ],
+      birthday: [
+        'assets/birthday/1.jpg','assets/birthday/2.jpg','assets/birthday/3.jpg',
+        'assets/birthday/4.jpg','assets/birthday/5.jpg','assets/birthday/6.jpg',
+      ],
+      party: [
+        'assets/party/1.jpg','assets/party/2.jpg','assets/party/3.jpg',
+        'assets/party/4.jpg','assets/party/5.jpg','assets/party/6.jpg',
+      ],
+      ceremony: [
+        'assets/ceremony/1.jpg','assets/ceremony/2.jpg','assets/ceremony/3.jpg',
+        'assets/ceremony/4.jpg','assets/ceremony/5.jpg','assets/ceremony/6.jpg',
+      ],
+      friends: [
+        'assets/friends/1.jpg','assets/friends/2.jpg','assets/friends/3.jpg',
+        'assets/friends/4.jpg','assets/friends/5.jpg','assets/friends/6.jpg',
+      ],
+    };
+
+    // Flatten to array of { src, key }
+    function allPhotosWithCat() {
+      const arr = [];
+      for (const c of CATS) {
+        (CAT_IMAGES[c.key]||[]).forEach(src => arr.push({ src, key: c.key }));
+      }
+      return arr;
+    }
+
+    // Home: take some images from all categories for hero + grid
+    const HOME_HERO_ITEMS = allPhotosWithCat().slice(0, 6);      // [{src,key}, ...]
+
+    // ---------- Simple Router ----------
+    let route = 'home';        // 'home' | 'portfolio' | 'portfolio:catKey' | 'about' | 'contact'
+    const app = document.getElementById('app');
+
+    function navigate(newRoute) {
+      route = newRoute;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      render();
+    }
+
+    // Events for nav buttons (event delegation)
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-route]');
+      if (btn) {
+        const value = btn.getAttribute('data-route');
+        navigate(value);
+        const mobile = document.getElementById('mobileMenu');
+        if (mobile) mobile.classList.add('hidden');
+      }
+    });
+
+    // Mobile menu toggle
+    document.getElementById('menuBtn').addEventListener('click', () => {
+      const mobile = document.getElementById('mobileMenu');
+      mobile.classList.toggle('hidden');
+    });
+
+    // ---------- Views ----------
+    function HomeView() {
+      return `
+        <section class="relative">
+          <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+            <div class="rounded-2xl overflow-hidden shadow-lg">
+              ${Carousel({ id: 'homeHero', items: HOME_HERO_ITEMS, height: 'h-[52vh] sm:h-[68vh]' })}
+            </div>
+          </div>
+        </section>
+
+        <section class="pb-16">
+          <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="flex items-end justify-between mb-6">
+              <h2 class="text-2xl sm:text-3xl font-semibold">Recent Moments</h2>
+              <button data-route="portfolio" class="text-sm text-blue-600 hover:underline">View Portfolio →</button>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              ${mixedGrid(12)}
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function PortfolioRootView() {
+      return `
+        <section class="py-10 sm:py-14">
+          <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <h1 class="text-3xl sm:text-4xl font-semibold mb-6">Portfolio</h1>
+            <p class="text-slate-600 mb-8">Choose a category to explore curated galleries. Each opens a dedicated page with its own carousel and grid.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              ${CATS.map(cat => CategoryCard(cat)).join('')}
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function PortfolioCategoryView(catKey) {
+      const cat = CATS.find(c => c.key === catKey) || CATS[0];
+      const imgs = CAT_IMAGES[cat.key] || [];
+      const heroItems = imgs.slice(0, 6).map(src => ({ src, key: cat.key }));
+      return `
+        <section class="relative">
+          <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+            <div class="flex items-center justify-between mb-4">
+              <h1 class="text-3xl sm:text-4xl font-semibold">${cat.label}</h1>
+              <button data-route="portfolio" class="text-sm text-blue-600 hover:underline">← All Categories</button>
+            </div>
+            <div class="rounded-2xl overflow-hidden shadow-lg">
+              ${Carousel({ id: `cat-${cat.key}`, items: heroItems, height: 'h-[44vh] sm:h-[58vh]' })}
+            </div>
+          </div>
+        </section>
+        <section class="pb-16">
+          <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <h2 class="text-2xl sm:text-3xl font-semibold mb-6">Gallery</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              ${imgs.map(src => ImageFigure(src, cat.label)).join('')}
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function AboutView() {
+      const aboutImg = 'assets/about.jpg';
+      return `
+        <section class="py-12 sm:py-16">
+          <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div class="order-2 md:order-1">
+                <h1 class="text-3xl sm:text-4xl font-semibold mb-4">About the Photographer</h1>
+                <p class="text-slate-700 leading-relaxed mb-4">Hi, I'm <strong>Arun</strong> — a Hyderabad‑based photographer who loves candid stories, warm light, and authentic smiles. I’ve shot weddings, birthdays, and intimate ceremonies across India. My goal is simple: freeze moments so you can feel them again.</p>
+                <p class="text-slate-700 leading-relaxed">When I’m not behind the lens, I’m scouting locations and crafting mood boards. Let’s make something beautiful together.</p>
+              </div>
+              <div class="order-1 md:order-2">
+                <img src="${aboutImg}" alt="Photographer portrait" class="w-full h-[380px] md:h-[520px] object-cover rounded-2xl shadow-xl"/>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function ContactView() {
+      return `
+        <section class="py-12 sm:py-16">
+          <div class="max-w-2xl mx-auto px-4 sm:px-6">
+            <h1 class="text-3xl sm:text-4xl font-semibold mb-2">Contact</h1>
+            <p class="text-slate-600 mb-8">Fill your details and choose how you want to notify me (Email or WhatsApp). This demo opens your mail/WhatsApp with a pre‑filled message.</p>
+            <form id="contactForm" class="grid gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+              <label class="grid gap-1">
+                <span class="text-sm">Name</span>
+                <input required name="name" type="text" class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Your name"/>
+              </label>
+              <label class="grid gap-1">
+                <span class="text-sm">Phone</span>
+                <input required name="phone" type="tel" class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Your phone"/>
+              </label>
+              <label class="grid gap-1">
+                <span class="text-sm">Email</span>
+                <input required name="email" type="email" class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="name@example.com"/>
+              </label>
+              <div class="flex items-center gap-6 py-2">
+                <label class="flex items-center gap-2 text-sm">
+                  <input type="checkbox" name="notifyEmail" checked class="w-4 h-4"/> Email
+                </label>
+                <label class="flex items-center gap-2 text-sm">
+                  <input type="checkbox" name="notifyWhatsApp" checked class="w-4 h-4"/> WhatsApp
+                </label>
+              </div>
+              <button class="mt-2 inline-flex justify-center items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 text-white hover:bg-black">
+                Submit
+              </button>
+              <p class="text-xs text-slate-500">Note: No server here — we'll open your email app and/or WhatsApp with your message.</p>
+            </form>
+          </div>
+        </section>
+      `;
+    }
+
+    // ---------- UI helpers ----------
+    function Carousel({ id, items, height = 'h-[50vh]', interval = 3500 }) {
+      // items = [{ src, key? }]
+      const slides = items.map((item, i) => `
+        <div class="carousel-slide ${i === 0 ? 'active' : ''}">
+          <img class="w-full ${height} object-cover" src="${item.src}" alt="Slide ${i+1}" loading="lazy" />
+          ${item.key ? `<button class=\"absolute inset-0\" data-route=\"portfolio:${item.key}\" aria-label=\"Open ${item.key}\"></button>` : ''}
+        </div>
+      `).join('');
+
+      return `
+        <div class="carousel ${height}" data-carousel data-id="${id}" data-interval="${interval}">
+          <div class="carousel-track ${height}">
+            ${slides}
+          </div>
+          <button class="carousel-btn prev" aria-label="Previous slide">◀</button>
+          <button class="carousel-btn next" aria-label="Next slide">▶</button>
+          <div class="absolute bottom-3 inset-x-0 flex justify-center gap-2" data-dots>
+            ${items.map((_,i)=>`<button class="w-2.5 h-2.5 rounded-full bg-white/60 ${i===0?'ring-2 ring-white':''}" data-dot="${i}" aria-label="Go to slide ${i+1}"></button>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function ImageCardHome(item, alt = 'Gallery image') {
+      // clickable card -> navigates to its category
+      return `
+        <button class="zoom-card rounded-xl overflow-hidden shadow-sm focusable" data-route="portfolio:${item.key}" aria-label="Open ${item.key}">
+          <img src="${item.src}" alt="${alt}" class="w-full h-44 sm:h-48 lg:h-52 object-cover" loading="lazy"/>
+        </button>
+      `;
+    }
+
+    function ImageFigure(src, alt = 'Gallery image') {
+      // non-clickable figure (used inside category gallery)
+      return `
+        <figure class="zoom-card rounded-xl overflow-hidden shadow-sm">
+          <img src="${src}" alt="${alt}" class="w-full h-44 sm:h-48 lg:h-52 object-cover" loading="lazy"/>
+        </figure>
+      `;
+    }
+
+    function mixedGrid(n = 12) {
+      // Take images across categories for the home grid
+      const pool = allPhotosWithCat();
+      return pool.slice(0, n).map((item,i)=>ImageCardHome(item, `Recent photo ${i+1}`)).join('');
+    }
+
+    function CategoryCard(cat) {
+      const cover = (CAT_IMAGES[cat.key] || [])[0] || 'assets/placeholder.jpg';
+      return `
+        <button class="relative rounded-2xl overflow-hidden shadow hover:shadow-md transition focusable group" data-route="portfolio:${cat.key}" aria-label="Open ${cat.label}">
+          <img src="${cover}" alt="${cat.label}" class="w-full h-56 object-cover group-hover:scale-105 transition duration-500"/>
+          <div class="absolute inset-0 bg-black/30"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+            <h3 class="text-lg font-semibold">${cat.label}</h3>
+            <p class="text-xs text-white/80">Tap to view gallery</p>
+          </div>
+        </button>
+      `;
+    }
+
+    // ---------- Mount / Render ----------
+    function render() {
+      if (route === 'home') app.innerHTML = HomeView();
+      else if (route.startsWith('portfolio:')) app.innerHTML = PortfolioCategoryView(route.split(':')[1]);
+      else if (route === 'portfolio') app.innerHTML = PortfolioRootView();
+      else if (route === 'about') app.innerHTML = AboutView();
+      else if (route === 'contact') app.innerHTML = ContactView();
+      else app.innerHTML = HomeView();
+
+      initCarousels();
+      initContactForm();
+    }
+
+    // ---------- Carousel Logic ----------
+    const carouselStates = new Map();
+
+    function initCarousels() {
+      // Clear previous timers
+      carouselStates.forEach(st => clearInterval(st.timer));
+      carouselStates.clear();
+
+      document.querySelectorAll('[data-carousel]').forEach(el => {
+        const dotsWrap = el.querySelector('[data-dots]');
+        const slides = Array.from(el.querySelectorAll('.carousel-slide'));
+        const interval = parseInt(el.getAttribute('data-interval')||'3500', 10);
+        const id = el.getAttribute('data-id') || Math.random().toString(36).slice(2);
+        let idx = 0;
+
+        function setActive(newIdx){
+          slides[idx].classList.remove('active');
+          dotsWrap?.children[idx]?.classList.remove('ring-2','ring-white');
+          idx = (newIdx + slides.length) % slides.length;
+          slides[idx].classList.add('active');
+          dotsWrap?.children[idx]?.classList.add('ring-2','ring-white');
+        }
+
+        const next = () => setActive(idx+1);
+        const prev = () => setActive(idx-1);
+
+        const timer = setInterval(next, interval);
+        carouselStates.set(id, { timer });
+
+        el.querySelector('.next')?.addEventListener('click', () => { next(); restart(); });
+        el.querySelector('.prev')?.addEventListener('click', () => { prev(); restart(); });
+
+        dotsWrap?.querySelectorAll('[data-dot]')?.forEach(dot => {
+          dot.addEventListener('click', () => { setActive(parseInt(dot.getAttribute('data-dot'))); restart(); });
+        });
+
+        function restart(){ clearInterval(timer); carouselStates.set(id, { timer: setInterval(next, interval) }); }
+      });
+    }
+
+    // ---------- Contact handler ----------
+    function initContactForm(){
+      const form = document.getElementById('contactForm');
+      if(!form) return;
+      // Rebind safely on render
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const name = fd.get('name');
+        const phone = fd.get('phone');
+        const email = fd.get('email');
+        const wantEmail = fd.get('notifyEmail') !== null; // checkbox present when checked
+        const wantWA = fd.get('notifyWhatsApp') !== null;
+
+        const msg = `New inquiry from ${name}\nPhone: ${phone}\nEmail: ${email}`;
+
+        if (!wantEmail && !wantWA) {
+          alert('Please select Email and/or WhatsApp.');
+          return;
+        }
+
+        if (wantEmail) {
+          const mail = `mailto:test@gmail.com?subject=${encodeURIComponent('New Inquiry from '+name)}&body=${encodeURIComponent(msg)}`;
+          window.open(mail, '_blank');
+        }
+        if (wantWA) {
+          // Prepend country code for WhatsApp (India +91)
+          const wa = `https://wa.me/918732446182?text=${encodeURIComponent(msg)}`;
+          window.open(wa, '_blank');
+        }
+
+        alert('We opened your Email/WhatsApp with your message.');
+        form.reset();
+      });
+    }
+
+    // Init
+    document.getElementById('year').textContent = new Date().getFullYear();
+    render();
+  </script>
+</body>
+</html>
