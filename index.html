@@ -1,12 +1,12 @@
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Photo shop</title>
-  <!-- Tailwind CDN (no build step) -->
+  <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     /* Carousel basics */
     .carousel { position: relative; overflow: hidden; }
@@ -17,46 +17,31 @@
     .carousel-btn:hover { background: rgba(0,0,0,.65); }
     .carousel-btn.prev { left: .5rem; }
     .carousel-btn.next { right: .5rem; }
-
-    /* Image hover zoom */
     .zoom-card img { transition: transform .5s ease, filter .5s ease; }
     .zoom-card:hover img { transform: scale(1.06); filter: saturate(1.05); }
-
-    /* Simple focus outline utility for clickable cards */
     .focusable:focus { outline: 3px solid #60a5fa; outline-offset: 2px; }
+    .page { display: none; }
+    .page.active { display: block; }
   </style>
 </head>
 <body class="bg-gradient-to-r from-slate-900 to-slate-600 text-white">
-  <!--
-    =============================
-    ASSETS SETUP (LOCAL IMAGES)
-    -----------------------------
-    Put your photos in this structure next to index.html:
-
-    /assets/about.jpg
-    /assets/wedding/1.jpg ... 6.jpg
-    /assets/birthday/1.jpg ... 6.jpg
-    /assets/party/1.jpg ... 6.jpg
-    /assets/ceremony/1.jpg ... 6.jpg
-    /assets/friends/1.jpg ... 6.jpg
-
-    Replace file names below as you like.
-  -->
 
   <!-- Header / Nav -->
-  <header class="sticky top-0 z-40 bg-gradient-to-r from-slate-900 backdrop-blur border-b border-slate-200 min-h-[148px]">
+  <header class="sticky top-0 z-40 bg-gradient-to-r from-slate-900 backdrop-blur border-b border-slate-200 min-h-[121px]">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
         <div class="flex items-center gap-2">
-          <div class="h-20 w-32 mt-20"><img src="./assets/logo.jpg" alt="logo" /></div>
+          <div class="h-20 w-36 mt-10">
+            <img src="assets/Visualcapture-photography.png" alt="logo" class="w-full h-full object-contain"/>
+          </div>
         </div>
         <!-- Tabs -->
-        <nav class="hidden sm:flex items-center gap-1 text-sm mt-16">
-          <button data-route="home" class="px-4 py-2 rounded-lg hover:bg-black" aria-label="Home">Home</button>
-          <button data-route="portfolio" class="px-4 py-2 rounded-lg hover:bg-black" aria-label="Portfolio">Portfolio</button>
-          <button data-route="about" class="px-4 py-2 rounded-lg hover:bg-black" aria-label="About">About</button>
-          <button data-route="contact" class="px-4 py-2 rounded-lg hover:bg-black" aria-label="Contact">Contact</button>
+        <nav class="hidden sm:flex items-center gap-1 text-sm mt-[32px]">
+          <button class="px-4 py-2 rounded-lg hover:bg-black" data-goto="home">Home</button>
+          <button class="px-4 py-2 rounded-lg hover:bg-black" data-goto="portfolio">Portfolio</button>
+          <button class="px-4 py-2 rounded-lg hover:bg-black" data-goto="about">About</button>
+          <button class="px-4 py-2 rounded-lg hover:bg-black" data-goto="contact">Contact</button>
         </nav>
         <!-- Mobile menu -->
         <div class="sm:hidden">
@@ -66,16 +51,16 @@
       <!-- Mobile sheet -->
       <div id="mobileMenu" class="hidden border-t border-slate-200 sm:hidden">
         <div class="py-2 grid">
-          <button data-route="home" class="text-left px-3 py-2 hover:bg-black">Home</button>
-          <button data-route="portfolio" class="text-left px-3 py-2 hover:bg-black">Portfolio</button>
-          <button data-route="about" class="text-left px-3 py-2 hover:bg-black">About</button>
-          <button data-route="contact" class="text-left px-3 py-2 hover:bg-black">Contact</button>
+          <button class="text-left px-3 py-2 hover:bg-black" data-goto="home">Home</button>
+          <button class="text-left px-3 py-2 hover:bg-black" data-goto="portfolio">Portfolio</button>
+          <button class="text-left px-3 py-2 hover:bg-black" data-goto="about">About</button>
+          <button class="text-left px-3 py-2 hover:bg-black" data-goto="contact">Contact</button>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Sticky Social Bar (visible on ≥768px only) -->
+  <!-- Sticky Social Bar (only ≥768px) -->
   <aside class="hidden md:flex fixed right-3 top-1/3 z-50">
     <div class="bg-white/10 backdrop-blur border border-white/20 rounded-xl p-2 flex flex-col gap-2 shadow-xl">
       <!-- WhatsApp -->
@@ -102,35 +87,292 @@
     </div>
   </aside>
 
-  <!-- App container -->
-  <main id="app" class="min-h-[70vh]"></main>
+  <!-- PAGES -->
+  <main class="min-h-[70vh]">
+    <!-- HOME -->
+    <section id="home" class="page active">
+      <!-- Hero Carousel -->
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <div class="rounded-2xl overflow-hidden shadow-lg">
+          <div class="carousel h-[52vh] sm:h-[68vh]" data-interval="3500">
+            <div id="homeHeroTrack" class="carousel-track h-full"></div>
+            <button class="carousel-btn prev" aria-label="Prev">◀</button>
+            <button class="carousel-btn next" aria-label="Next">▶</button>
+            <div class="absolute bottom-3 inset-x-0 flex justify-center gap-2" data-dots></div>
+          </div>
+        </div>
+      </div>
 
+      <!-- Recent Moments Grid -->
+      <div class="pb-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+          <div class="flex items-end justify-between mb-6">
+            <h2 class="text-2xl sm:text-3xl font-semibold">Recent Moments</h2>
+            <button data-goto="portfolio" class="text-sm text-blue-400 hover:underline">View Portfolio →</button>
+          </div>
+          <div id="recentGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PORTFOLIO ROOT -->
+    <section id="portfolio" class="page">
+      <div class="py-10 sm:py-14">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+          <h1 class="text-3xl sm:text-4xl font-semibold mb-6">Portfolio</h1>
+          <p class="text-slate-300 mb-8">Choose a category to explore. Each one has a carousel and a grid.</p>
+
+          <div id="portfolioCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORY PAGES (one per category) -->
+    <section id="portfolio-wedding" class="page">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <div class="flex items-center justify-between mb-4">
+          <h1 class="text-3xl sm:text-4xl font-semibold">Wedding Photos</h1>
+          <button data-goto="portfolio" class="text-sm text-blue-400 hover:underline">← All Categories</button>
+        </div>
+
+        <div class="rounded-2xl overflow-hidden shadow-lg mb-10">
+          <div class="carousel h-[44vh] sm:h-[58vh]" data-interval="3500">
+            <div id="carouselTrack-wedding" class="carousel-track h-full"></div>
+            <button class="carousel-btn prev">◀</button>
+            <button class="carousel-btn next">▶</button>
+            <div class="absolute bottom-3 inset-x-0 flex justify-center gap-2" data-dots></div>
+          </div>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-semibold mb-6">Gallery</h2>
+        <div id="gallery-wedding" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+      </div>
+    </section>
+
+    <section id="portfolio-birthday" class="page">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <div class="flex items-center justify-between mb-4">
+          <h1 class="text-3xl sm:text-4xl font-semibold">Birthday Photos</h1>
+          <button data-goto="portfolio" class="text-sm text-blue-400 hover:underline">← All Categories</button>
+        </div>
+
+        <div class="rounded-2xl overflow-hidden shadow-lg mb-10">
+          <div class="carousel h-[44vh] sm:h-[58vh]" data-interval="3500">
+            <div id="carouselTrack-birthday" class="carousel-track h-full"></div>
+            <button class="carousel-btn prev">◀</button>
+            <button class="carousel-btn next">▶</button>
+            <div class="absolute bottom-3 inset-x-0 flex justify-center gap-2" data-dots></div>
+          </div>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-semibold mb-6">Gallery</h2>
+        <div id="gallery-birthday" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+      </div>
+    </section>
+
+    <section id="portfolio-party" class="page">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <div class="flex items-center justify-between mb-4">
+          <h1 class="text-3xl sm:text-4xl font-semibold">Party Photos</h1>
+          <button data-goto="portfolio" class="text-sm text-blue-400 hover:underline">← All Categories</button>
+        </div>
+
+        <div class="rounded-2xl overflow-hidden shadow-lg mb-10">
+          <div class="carousel h-[44vh] sm:h-[58vh]" data-interval="3500">
+            <div id="carouselTrack-party" class="carousel-track h-full"></div>
+            <button class="carousel-btn prev">◀</button>
+            <button class="carousel-btn next">▶</button>
+            <div class="absolute bottom-3 inset-x-0 flex justify-center gap-2" data-dots></div>
+          </div>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-semibold mb-6">Gallery</h2>
+        <div id="gallery-party" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+      </div>
+    </section>
+
+    <section id="portfolio-ceremony" class="page">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <div class="flex items-center justify-between mb-4">
+          <h1 class="text-3xl sm:text-4xl font-semibold">Ceremony Photos</h1>
+          <button data-goto="portfolio" class="text-sm text-blue-400 hover:underline">← All Categories</button>
+        </div>
+
+        <div class="rounded-2xl overflow-hidden shadow-lg mb-10">
+          <div class="carousel h-[44vh] sm:h-[58vh]" data-interval="3500">
+            <div id="carouselTrack-ceremony" class="carousel-track h-full"></div>
+            <button class="carousel-btn prev">◀</button>
+            <button class="carousel-btn next">▶</button>
+            <div class="absolute bottom-3 inset-x-0 flex justify-center gap-2" data-dots></div>
+          </div>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-semibold mb-6">Gallery</h2>
+        <div id="gallery-ceremony" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+      </div>
+    </section>
+
+    <section id="portfolio-friends" class="page">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <div class="flex items-center justify-between mb-4">
+          <h1 class="text-3xl sm:text-4xl font-semibold">Friends Photos</h1>
+          <button data-goto="portfolio" class="text-sm text-blue-400 hover:underline">← All Categories</button>
+        </div>
+
+        <div class="rounded-2xl overflow-hidden shadow-lg mb-10">
+          <div class="carousel h-[44vh] sm:h-[58vh]" data-interval="3500">
+            <div id="carouselTrack-friends" class="carousel-track h-full"></div>
+            <button class="carousel-btn prev">◀</button>
+            <button class="carousel-btn next">▶</button>
+            <div class="absolute bottom-3 inset-x-0 flex justify-center gap-2" data-dots></div>
+          </div>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-semibold mb-6">Gallery</h2>
+        <div id="gallery-friends" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="page">
+      <div class="py-12 sm:py-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+          <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div class="order-2 md:order-1">
+              <h1 class="text-3xl sm:text-4xl font-semibold mb-4">About the Photographer</h1>
+              <p class="text-slate-200 leading-relaxed mb-4">Hi, I'm <strong>Arun</strong> — a Hyderabad-based photographer who loves candid stories, warm light, and authentic smiles. I’ve shot weddings, birthdays, and intimate ceremonies across India. My goal is simple: freeze moments so you can feel them again.</p>
+              <p class="text-slate-200 leading-relaxed">When I’m not behind the lens, I’m scouting locations and crafting mood boards. Let’s make something beautiful together.</p>
+            </div>
+            <div class="order-1 md:order-2">
+              <img src="assets/about.jpg" alt="Photographer portrait" class="w-full h-[380px] md:h-[520px] object-cover rounded-2xl shadow-xl"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Three simple cards with counting animation -->
+      <div class="pb-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="rounded-2xl border border-white/15 bg-white/10 p-6 text-center">
+              <img src="assets/about.jpg" alt="Experience" class="w-20 h-20 rounded-full object-cover mx-auto mb-4">
+              <h3 class="text-lg font-semibold mb-2">Years of Experience</h3>
+              <div class="text-3xl font-bold"><span class="countup" data-count-target="20" data-count-duration="2000">0</span>+</div>
+            </div>
+            <div class="rounded-2xl border border-white/15 bg-white/10 p-6 text-center">
+              <img src="assets/about.jpg" alt="Events" class="w-20 h-20 rounded-full object-cover mx-auto mb-4">
+              <h3 class="text-lg font-semibold mb-2">Events Covered</h3>
+              <div class="text-3xl font-bold"><span class="countup" data-count-target="75" data-count-duration="2000">0</span>+</div>
+            </div>
+            <div class="rounded-2xl border border-white/15 bg-white/10 p-6 text-center">
+              <img src="assets/about.jpg" alt="Happy Clients" class="w-20 h-20 rounded-full object-cover mx-auto mb-4">
+              <h3 class="text-lg font-semibold mb-2">Happy Clients</h3>
+              <div class="text-3xl font-bold"><span class="countup" data-count-target="150" data-count-duration="2000">0</span>+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="page">
+      <div class="py-12 sm:py-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+          <h1 class="text-3xl sm:text-4xl font-semibold mb-2">Contact</h1>
+          <p class="text-slate-300 mb-8">Fill your details and choose how you want to notify me (Email or WhatsApp). You can also find our studio on the map and get directions.</p>
+
+          <div class="grid md:grid-cols-2 gap-8">
+            <!-- Form -->
+            <form id="contactForm" class="grid gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+              <label class="grid gap-1">
+                <span class="text-sm">Name</span>
+                <input required name="name" type="text" class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900" placeholder="Your name"/>
+              </label>
+              <label class="grid gap-1">
+                <span class="text-sm">Phone</span>
+                <input required name="phone" type="tel" class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900" placeholder="Your phone"/>
+              </label>
+              <label class="grid gap-1">
+                <span class="text-sm">Email</span>
+                <input required name="email" type="email" class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900" placeholder="name@example.com"/>
+              </label>
+              <div class="flex items-center gap-6 py-2">
+                <label class="flex items-center gap-2 text-sm text-slate-900">
+                  <input type="checkbox" name="notifyEmail" checked class="w-4 h-4"/> Email
+                </label>
+                <label class="flex items-center gap-2 text-sm text-slate-900">
+                  <input type="checkbox" name="notifyWhatsApp" checked class="w-4 h-4"/> WhatsApp
+                </label>
+              </div>
+              <button class="mt-2 inline-flex justify-center items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 text-white hover:bg-black">
+                Submit
+              </button>
+              <p class="text-xs text-slate-500">Note: No server here — we'll open your email app and/or WhatsApp with your message.</p>
+            </form>
+
+            <!-- Map & Address -->
+            <div class="space-y-4">
+              <div class="flex items-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mt-0.5 flex-none" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>
+                <div>
+                  <div class="font-medium">Studio Address</div>
+                  <a id="contactAddressText" href="#" target="_blank" rel="noopener" class="text-slate-300 hover:underline"></a>
+                </div>
+              </div>
+
+              <p class="text-xs text-white/80">Tip: Tap the map to open Google Maps directions.</p>
+
+              <div class="relative rounded-2xl overflow-hidden border border-white/15 shadow">
+                <iframe id="mapEmbed"
+                  src=""
+                  class="w-full h-[320px]"
+                  style="border:0;"
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  aria-label="Google Map showing studio location"
+                ></iframe>
+                <a id="mapOverlayLink" href="#" target="_blank" rel="noopener" class="absolute inset-0" aria-label="Open Google Maps for directions"></a>
+              </div>
+
+              <a id="mapDirectionsBtn" href="#" target="_blank" rel="noopener"
+                 class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M21.71 11.29l-9-9a1 1 0 00-1.42 0l-9 9A1 1 0 003 13h7v7a1 1 0 002 0v-7h7a1 1 0 00.71-1.71z"/></svg>
+                Get Directions
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
   <footer class="border-t border-slate-200 mt-16">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 text-sm text-slate-300 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
       <div class="space-y-1">
         <p>© <span id="year"></span> photoshop. All rights reserved.</p>
-        <!-- Address in footer -->
         <address class="not-italic flex items-start gap-2">
-          <!-- pin icon -->
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-0.5 flex-none" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>
           <a id="footerAddressLink" href="#" target="_blank" rel="noopener" class="hover:underline"></a>
         </address>
       </div>
-      <!-- Footer Socials (visible on mobile & desktop) -->
+
+      <!-- Footer Socials (mobile & desktop) -->
       <div class="flex items-center gap-3 text-white/80">
-        <a href="https://wa.me/8096143780" target="_blank" rel="noopener noreferrer" class="w-10 h-10 grid place-content-center rounded-lg hover:bg-white/15 transition focusable" aria-label="WhatsApp">
+             <!-- WhatsApp -->
+      <a href="https://wa.me/918732446182" target="_blank" rel="noopener noreferrer" class="w-10 h-10 grid place-content-center rounded-lg hover:bg-white/15 transition focusable" aria-label="WhatsApp">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor"><path d="M20.52 3.48A11.94 11.94 0 0012 0C5.37 0 0 5.37 0 12c0 2.11.55 4.1 1.6 5.88L0 24l6.33-1.63A11.93 11.93 0 0012 24c6.63 0 12-5.37 12-12 0-3.19-1.24-6.19-3.48-8.52zM12 22a9.94 9.94 0 01-5.07-1.4l-.36-.21-3.76.97.99-3.66-.24-.38A9.95 9.95 0 1122 12c0 5.52-4.48 10-10 10zm5.22-7.53c-.29-.15-1.69-.83-1.95-.93-.26-.09-.45-.15-.64.15-.19.29-.74.93-.91 1.12-.17.19-.34.22-.63.07-.29-.15-1.21-.45-2.31-1.44-.85-.76-1.43-1.69-1.6-1.98-.17-.29-.02-.45.13-.6.13-.13.29-.34.43-.51.14-.17.19-.29.29-.48.1-.19.05-.36-.02-.51-.07-.15-.64-1.54-.88-2.11-.23-.56-.47-.49-.64-.5-.17-.01-.36-.01-.55-.01s-.51.07-.77.36c-.26.29-1.01.99-1.01 2.42s1.03 2.81 1.17 3c.14.19 2.03 3.29 4.92 4.62.69.3 1.22.48 1.64.61.69.22 1.31.19 1.8.11.55-.08 1.69-.69 1.93-1.36.24-.67.24-1.25.17-1.36-.07-.11-.26-.18-.55-.33z"/></svg>
       </a>
       <!-- Instagram -->
-      <a href="https://www.instagram.com/visualcapturephotography?utm_source=qr&igsh=MXFsNW1kbzd0MHZtaA==" target="_blank" rel="noopener noreferrer" class="w-10 h-10 grid place-content-center rounded-lg hover:bg-white/15 transition focusable" aria-label="Instagram">
+      <a href="https://instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" class="w-10 h-10 grid place-content-center rounded-lg hover:bg-white/15 transition focusable" aria-label="Instagram">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.9.2 2.4.4.6.2 1 .5 1.5 1 .5.5.8.9 1 1.5.2.5.3 1.2.4 2.4.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.9-.4 2.4-.2.6-.5 1-.9 1.5-.5.5-.9.8-1.5 1-.5.2-1.2.3-2.4.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.9-.2-2.4-.4-.6-.2-1-.5-1.5-1-.5-.5-.8-.9-1-1.5-.2-.5-.3-1.2-.4-2.4C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.2-1.9.4-2.4.2-.6.5-1 .9-1.5.5-.5.9-.8 1.5-1 .5-.2 1.2-.3 2.4-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1 0-1.6.2-1.9.3-.5.2-.8.4-1.2.8-.4.4-.6.7-.8 1.2-.1.3-.3.9-.3 1.9-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c0 1 .2 1.6.3 1.9.2.5.4.8.8 1.2.4.4.7.6 1.2.8.3.1.9.3 1.9.3 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1 0 1.6-.2 1.9-.3.5-.2.8-.4 1.2-.8.4-.4.6-.7.8-1.2.1-.3.3-.9.3-1.9.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c0-1-.2-1.6-.3-1.9-.2-.5-.4-.8-.8-1.2-.4-.4-.7-.6-1.2-.8-.3-.1-.9-.3-1.9-.3-1.2-.1-1.6-.1-4.7-.1zm0 3.2a4.8 4.8 0 110 9.6 4.8 4.8 0 010-9.6zm0 1.8a3 3 0 100 6 3 3 0 000-6zm5.8-.9a1.1 1.1 0 110 2.2 1.1 1.1 0 010-2.2z"/></svg>
       </a>
       <!-- Facebook -->
-      <a href="https://www.facebook.com/profile.php?id=100063913878476&sfnsn=wiwspwa&mibextid=RUbZ1f" target="_blank" rel="noopener noreferrer" class="w-10 h-10 grid place-content-center rounded-lg hover:bg-white/15 transition focusable" aria-label="Facebook">
+      <a href="https://facebook.com/yourpage" target="_blank" rel="noopener noreferrer" class="w-10 h-10 grid place-content-center rounded-lg hover:bg-white/15 transition focusable" aria-label="Facebook">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor"><path d="M22 12a10 10 0 10-11.6 9.9v-7h-2.3V12h2.3V9.8c0-2.3 1.4-3.6 3.5-3.6 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.5.7-1.5 1.4V12h2.6l-.4 2.9h-2.2v7A10 10 0 0022 12z"/></svg>
       </a>
-      <!-- Youtube -->
-  <a href="https://youtube.com/@visualcapturephotography625?si=hLjNIm-sXJ8HW3qc" target="_blank" rel="noopener noreferrer"
+      <!-- YOutube -->
+       <a href="https://youtube.com/@visualcapturephotography625?si=hLjNIm-sXJ8HW3qc" target="_blank" rel="noopener noreferrer"
    class="w-10 h-10 grid place-content-center rounded-lg hover:bg-white/15 transition focusable"
    aria-label="YouTube">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -138,447 +380,220 @@
     <path d="M23.498 6.186a2.97 2.97 0 0 0-2.09-2.102C19.402 3.5 12 3.5 12 3.5s-7.402 0-9.408.584a2.97 2.97 0 0 0-2.09 2.102A31.16 31.16 0 0 0 0 12c0 1.999.17 3.988.502 5.814a2.97 2.97 0 0 0 2.09 2.102C4.598 20.5 12 20.5 12 20.5s7.402 0 9.408-.584a2.97 2.97 0 0 0 2.09-2.102C23.83 15.988 24 13.999 24 12c0-1.999-.17-3.988-.502-5.814zM9.75 15.5v-7L15.5 12 9.75 15.5z"/>
   </svg>
 </a>
-
       </div>
     </div>
   </footer>
 
+  <!-- SCRIPTS -->
   <script>
-    // ---------- Data ----------
-    const CATS = [
-      { key: 'wedding',  label: 'Wedding Photos' },
-      { key: 'birthday', label: 'Birthday Photos' },
-      { key: 'party',    label: 'Party Photos' },
-      { key: 'ceremony', label: 'Ceremony Photos' },
-      { key: 'friends',  label: 'Friends Photos' },
-      // { key: 'Videos',   label: 'Videos' },
-    ];
-
-    const CAT_IMAGES = {
-      wedding: [
-        'assets/wedding/logo.jpg','assets/wedding/download.jpg','assets/wedding/logo.jpg',
-        'assets/wedding/download.jpg','assets/wedding/logo.jpg','assets/wedding/download.jpg',
-      ],
-      birthday: [
-       'assets/party/logo.jpg','assets/party/download.jpg','assets/party/logo.jpg',
-        'assets/party/download.jpg','assets/party/logo.jpg','assets/party/download.jpg',
-      ],
-      party: [
-        'assets/party/logo.jpg','assets/party/download.jpg','assets/party/logo.jpg',
-        'assets/party/download.jpg','assets/party/logo.jpg','assets/party/download.jpg',
-      ],
-      ceremony: [
-        'assets/ceremony/logo.jpg','assets/ceremony/download.jpg','assets/ceremony/logo.jpg',
-        'assets/ceremony/download.jpg','assets/ceremony/logo.jpg','assets/ceremony/download.jpg',
-      ],
-      friends: [
-        'assets/friends/logo.jpg','assets/friends/download.jpg','assets/friends/logo.jpg',
-        'assets/friends/download.jpg','assets/friends/logo.jpg','assets/friends/download.jpg',
-      ],
-      // Videos: [
-      //   'assets/videos/logo.jpg','assets/videos/download.jpg','assets/videos/logo.jpg',
-      // ],
-    };
-
-    // Address (edit this to your real studio address)
+    // ====== CONFIG: address ======
     const ADDRESS_TEXT = 'Visual Capture Photography, Shop No.7, 8-91/145, Phase 4, Hasthinapuram South, Hastinapuram, Hyderabad, Telangana 500079';
     const MAP_QUERY = encodeURIComponent(ADDRESS_TEXT);
     const MAP_EMBED_SRC = `https://www.google.com/maps?q=${MAP_QUERY}&output=embed`;
     const MAP_DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${MAP_QUERY}`;
 
-    // Flatten to array of { src, key }
-    function allPhotosWithCat() {
-      const arr = [];
-      for (const c of CATS) {
-        (CAT_IMAGES[c.key]||[]).forEach(src => arr.push({ src, key: c.key }));
-      }
-      return arr;
+    const CATS = [
+      { key: 'wedding',  label: 'Wedding Photos',  dir: 'assets/wedding/'  },
+      { key: 'birthday', label: 'Birthday Photos', dir: 'assets/birthday/' },
+      { key: 'party',    label: 'Party Photos',    dir: 'assets/party/'    },
+      { key: 'ceremony', label: 'Ceremony Photos', dir: 'assets/ceremony/' },
+      { key: 'friends',  label: 'Friends Photos',  dir: 'assets/friends/'  },
+    ];
+
+    const IMAGES = {
+      wedding:  ['logo.jpg','download.jpg','logo.jpg','download.jpg','logo.jpg','download.jpg'],
+      birthday: ['logo.jpg','download.jpg','logo.jpg','download.jpg','logo.jpg','download.jpg'],
+      party:    ['logo.jpg','download.jpg','logo.jpg','download.jpg','logo.jpg','download.jpg'],
+      ceremony: ['logo.jpg','download.jpg','logo.jpg','download.jpg','logo.jpg','download.jpg'],
+      friends:  ['logo.jpg','download.jpg','logo.jpg','download.jpg','logo.jpg','download.jpg'],
+    };
+
+    function fullPaths(catKey) {
+      const cat = CATS.find(c => c.key === catKey);
+      const files = IMAGES[catKey] || [];
+      return files.map(f => cat.dir + f);
     }
 
-    // Home: take some images from all categories for hero + grid
-    const HOME_HERO_ITEMS = allPhotosWithCat().slice(0, 6);      // [{src,key}, ...]
+    function createSlide(src, gotoId) {
+      const slide = document.createElement('div');
+      slide.className = 'carousel-slide';
+      slide.innerHTML = `
+        <img src="${src}" class="w-full h-full object-cover" alt="">
+        ${gotoId ? `<button class="absolute inset-0" data-goto="${gotoId}" aria-label="Open"></button>` : ''}
+      `;
+      return slide;
+    }
 
-    // ---------- Simple Router ----------
-    let route = 'home';        // 'home' | 'portfolio' | 'portfolio:catKey' | 'about' | 'contact'
-    const app = document.getElementById('app');
+    function createThumb(src, gotoId, alt) {
+      const btn = document.createElement('button');
+      btn.className = 'zoom-card rounded-xl overflow-hidden shadow focusable';
+      btn.setAttribute('data-goto', gotoId);
+      btn.innerHTML = `<img src="${src}" alt="${alt||''}" class="w-full h-44 sm:h-48 lg:h-52 object-cover">`;
+      return btn;
+    }
 
-    function navigate(newRoute) {
-      route = newRoute;
+    function createCategoryCard(cat, coverSrc) {
+      const btn = document.createElement('button');
+      btn.className = 'relative rounded-2xl overflow-hidden shadow hover:shadow-md transition focusable group';
+      btn.setAttribute('data-goto', `portfolio-${cat.key}`);
+      btn.setAttribute('aria-label', `Open ${cat.label}`);
+      btn.innerHTML = `
+        <img src="${coverSrc}" alt="${cat.label}" class="w-full h-56 object-cover group-hover:scale-105 transition duration-500"/>
+        <div class="absolute inset-0 bg-black/30"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
+          <h3 class="text-lg font-semibold">${cat.label}</h3>
+          <p class="text-xs text-white/80">Tap to view gallery</p>
+        </div>
+      `;
+      return btn;
+    }
+
+    function fillCarousel(trackEl, images, gotoIdPrefix) {
+      trackEl.innerHTML = '';
+      images.forEach((src, i) => {
+        const slide = createSlide(src, gotoIdPrefix ? `${gotoIdPrefix}` : '');
+        if (i === 0) slide.classList.add('active');
+        trackEl.appendChild(slide);
+      });
+    }
+
+    function fillGallery(gridEl, images, alt) {
+      gridEl.innerHTML = '';
+      images.forEach(src => {
+        const fig = document.createElement('figure');
+        fig.className = 'zoom-card rounded-xl overflow-hidden shadow';
+        fig.innerHTML = `<img src="${src}" alt="${alt||''}" class="w-full h-44 sm:h-48 lg:h-52 object-cover">`;
+        gridEl.appendChild(fig);
+      });
+    }
+
+    // ====== YEAR & ADDRESS LINKS ======
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const footerAddr = document.getElementById('footerAddressLink');
+    const contactAddr = document.getElementById('contactAddressText');
+    const mapEmbed = document.getElementById('mapEmbed');
+    const mapOverlayLink = document.getElementById('mapOverlayLink');
+    const mapDirectionsBtn = document.getElementById('mapDirectionsBtn');
+
+    if (footerAddr) { footerAddr.textContent = ADDRESS_TEXT; footerAddr.href = MAP_DIRECTIONS_URL; }
+    if (contactAddr) { contactAddr.textContent = ADDRESS_TEXT; contactAddr.href = MAP_DIRECTIONS_URL; }
+    if (mapEmbed) { mapEmbed.src = MAP_EMBED_SRC; }
+    if (mapOverlayLink) { mapOverlayLink.href = MAP_DIRECTIONS_URL; }
+    if (mapDirectionsBtn) { mapDirectionsBtn.href = MAP_DIRECTIONS_URL; }
+
+    // ====== SIMPLE NAV: show/hide sections by id ======
+    const pages = Array.from(document.querySelectorAll('.page'));
+    function showPage(id) {
+      pages.forEach(p => p.classList.remove('active'));
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      render();
+      if (id === 'about') startCounters();
     }
 
-    // Events for nav buttons (event delegation)
     document.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-route]');
-      if (btn) {
-        const value = btn.getAttribute('data-route');
-        navigate(value);
-        const mobile = document.getElementById('mobileMenu');
-        if (mobile) mobile.classList.add('hidden');
-      }
+      const btn = e.target.closest('[data-goto]');
+      if (!btn) return;
+      const id = btn.getAttribute('data-goto');
+      document.getElementById('mobileMenu')?.classList.add('hidden');
+      showPage(id);
     });
 
-    // Mobile menu toggle
-    document.getElementById('menuBtn').addEventListener('click', () => {
+    document.getElementById('menuBtn')?.addEventListener('click', () => {
       const mobile = document.getElementById('mobileMenu');
       mobile.classList.toggle('hidden');
     });
 
-    // ---------- Views ----------
-    function HomeView() {
-      return `
-        <section class="relative">
-          <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
-            <div class="rounded-2xl overflow-hidden shadow-lg">
-              ${Carousel({ id: 'homeHero', items: HOME_HERO_ITEMS, height: 'h-[52vh] sm:h-[68vh]' })}
-            </div>
-          </div>
-        </section>
-
-        <section class="pb-16">
-          <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <div class="flex items-end justify-between mb-6">
-              <h2 class="text-2xl sm:text-3xl font-semibold">Recent Moments</h2>
-              <button data-route="portfolio" class="text-sm text-blue-400 hover:underline">View Portfolio →</button>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              ${mixedGrid(12)}
-            </div>
-          </div>
-        </section>
-      `;
-    }
-
-    function PortfolioRootView() {
-      return `
-        <section class="py-10 sm:py-14">
-          <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <h1 class="text-3xl sm:text-4xl font-semibold mb-6">Portfolio</h1>
-            <p class="text-slate-300 mb-8">Choose a category to explore curated galleries. Each opens a dedicated page with its own carousel and grid.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              ${CATS.map(cat => CategoryCard(cat)).join('')}
-            </div>
-          </div>
-        </section>
-      `;
-    }
-
-  function PortfolioCategoryView(catKey) {
-      const cat = CATS.find(c => c.key === catKey) || CATS[0];
-      const imgs = CAT_IMAGES[cat.key] || [];
-      const heroItems = imgs.slice(0, 6).map(src => ({ src, key: cat.key }));
-      return `
-        <section class="relative">
-          <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
-            <div class="flex items-center justify-between mb-4">
-              <h1 class="text-3xl sm:text-4xl font-semibold">${cat.label}</h1>
-              <button data-route="portfolio" class="text-sm text-blue-400 hover:underline">← All Categories</button>
-            </div>
-            <div class="rounded-2xl overflow-hidden shadow-lg">
-              ${Carousel({ id: `cat-${cat.key}`, items: heroItems, height: 'h-[44vh] sm:h-[58vh]' })}
-            </div>
-          </div>
-        </section>
-        <section class="pb-16">
-          <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <h2 class="text-2xl sm:text-3xl font-semibold mb-6">Gallery</h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              ${imgs.map(src => ImageFigure(src, cat.label)).join('')}
-            </div>
-          </div>
-        </section>
-      `;
-    }
-
-
-    function AboutView() {
-      const aboutImg = 'assets/about.jpg';
-      return `
-        <section class="py-12 sm:py-16">
-          <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-              <div class="order-2 md:order-1">
-                <h1 class="text-3xl sm:text-4xl font-semibold mb-4">About the Photographer</h1>
-                <p class="text-slate-200 leading-relaxed mb-4">Hi, I'm <strong>Arun</strong> — a Hyderabad-based photographer who loves candid stories, warm light, and authentic smiles. I’ve shot weddings, birthdays, and intimate ceremonies across India. My goal is simple: freeze moments so you can feel them again.</p>
-                <p class="text-slate-200 leading-relaxed">When I’m not behind the lens, I’m scouting locations and crafting mood boards. Let’s make something beautiful together.</p>
-              </div>
-              <div class="order-1 md:order-2">
-                <img src="${aboutImg}" alt="Photographer portrait" class="w-full h-[380px] md:h-[520px] object-cover rounded-2xl shadow-xl"/>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Three Stats Cards with Counting Animation -->
-        <section class="pb-16">
-          <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <!-- Card 1 -->
-              <div class="rounded-2xl border border-white/15 bg-white/10 p-6 text-center">
-                <img src="assets/about.jpg" alt="Experience" class="w-20 h-20 rounded-full object-cover mx-auto mb-4">
-                <h3 class="text-lg font-semibold mb-2">Years of Experience</h3>
-                <div class="text-3xl font-bold">
-                  <span class="countup" data-count-target="20" data-count-duration="2000">0</span>+
-                </div>
-              </div>
-              <!-- Card 2 -->
-              <div class="rounded-2xl border border-white/15 bg-white/10 p-6 text-center">
-                <img src="assets/about.jpg" alt="Events" class="w-20 h-20 rounded-full object-cover mx-auto mb-4">
-                <h3 class="text-lg font-semibold mb-2">Events Covered</h3>
-                <div class="text-3xl font-bold">
-                  <span class="countup" data-count-target="75" data-count-duration="2000">0</span>+
-                </div>
-              </div>
-              <!-- Card 3 -->
-              <div class="rounded-2xl border border-white/15 bg-white/10 p-6 text-center">
-                <img src="assets/about.jpg" alt="Happy Clients" class="w-20 h-20 rounded-full object-cover mx-auto mb-4">
-                <h3 class="text-lg font-semibold mb-2">Happy Clients</h3>
-                <div class="text-3xl font-bold">
-                  <span class="countup" data-count-target="150" data-count-duration="2000">0</span>+
-                </div>
-              </div>
-            </div>
-            
-          </div>
-        </section>
-      `;
-    }
-
-    function ContactView() {
-      return `
-        <section class="py-12 sm:py-16">
-          <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <h1 class="text-3xl sm:text-4xl font-semibold mb-2">Contact</h1>
-            <p class="text-slate-300 mb-8">Fill your details and choose how you want to notify me (Email or WhatsApp). You can also find our studio on the map and get directions.</p>
-
-            <div class="grid md:grid-cols-2 gap-8">
-              <!-- Form -->
-              <form id="contactForm" class="grid gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                <label class="grid gap-1">
-                  <span class="text-sm">Name</span>
-                  <input required name="name" type="text" class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900" placeholder="Your name"/>
-                </label>
-                <label class="grid gap-1">
-                  <span class="text-sm">Phone</span>
-                  <input required name="phone" type="tel" class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900" placeholder="Your phone"/>
-                </label>
-                <label class="grid gap-1">
-                  <span class="text-sm">Email</span>
-                  <input required name="email" type="email" class="px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900" placeholder="name@example.com"/>
-                </label>
-                <div class="flex items-center gap-6 py-2">
-                  <label class="flex items-center gap-2 text-sm text-slate-900">
-                    <input type="checkbox" name="notifyEmail" checked class="w-4 h-4"/> Email
-                  </label>
-                  <label class="flex items-center gap-2 text-sm text-slate-900">
-                    <input type="checkbox" name="notifyWhatsApp" checked class="w-4 h-4"/> WhatsApp
-                  </label>
-                </div>
-                <button class="mt-2 inline-flex justify-center items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 text-white hover:bg-black">
-                  Submit
-                </button>
-                <p class="text-xs text-slate-500">Note: No server here — we'll open your email app and/or WhatsApp with your message.</p>
-              </form>
-
-              <!-- Map & Address -->
-              <div class="space-y-4">
-                <div class="flex items-start gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mt-0.5 flex-none" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>
-                  <div>
-                    <div class="font-medium">Studio Address</div>
-                    <a href="${MAP_DIRECTIONS_URL}" target="_blank" rel="noopener" class="text-slate-300 hover:underline" id="contactAddressText"></a>
-                  </div>
-                </div>
-
-                <p class="text-xs text-white/80">Tip: Tap the map to open Google Maps directions.</p>
-
-                <div class="relative rounded-2xl overflow-hidden border border-white/15 shadow">
-                  <iframe
-                    src="${MAP_EMBED_SRC}"
-                    class="w-full h-[320px]"
-                    style="border:0;"
-                    loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
-                    aria-label="Google Map showing studio location"
-                  ></iframe>
-                  <!-- Click overlay to open directions -->
-                  <a href="${MAP_DIRECTIONS_URL}" target="_blank" rel="noopener" class="absolute inset-0" aria-label="Open Google Maps for directions"></a>
-                </div>
-
-                <a href="${MAP_DIRECTIONS_URL}" target="_blank" rel="noopener"
-                   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M21.71 11.29l-9-9a1 1 0 00-1.42 0l-9 9A1 1 0 003 13h7v7a1 1 0 002 0v-7h7a1 1 0 00.71-1.71z"/></svg>
-                  Get Directions
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-      `;
-    }
-
-    // ---------- UI helpers ----------
-    function Carousel({ id, items, height = 'h-[50vh]', interval = 3500 }) {
-      // items = [{ src, key? }]
-      const slides = items.map((item, i) => `
-        <div class="carousel-slide ${i === 0 ? 'active' : ''}">
-          <img class="w-full ${height} object-cover" src="${item.src}" alt="Slide ${i+1}" loading="lazy" />
-          ${item.key ? `<button class="absolute inset-0" data-route="portfolio:${item.key}" aria-label="Open ${item.key}"></button>` : ''}
-        </div>
-      `).join('');
-
-      return `
-        <div class="carousel ${height}" data-carousel data-id="${id}" data-interval="${interval}">
-          <div class="carousel-track ${height}">
-            ${slides}
-          </div>
-          <button class="carousel-btn prev" aria-label="Previous slide">◀</button>
-          <button class="carousel-btn next" aria-label="Next slide">▶</button>
-          <div class="absolute bottom-3 inset-x-0 flex justify-center gap-2" data-dots>
-            ${items.map((_,i)=>`<button class="w-2.5 h-2.5 rounded-full bg-white/60 ${i===0?'ring-2 ring-white':''}" data-dot="${i}" aria-label="Go to slide ${i+1}"></button>`).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function ImageCardHome(item, alt = 'Gallery image') {
-      // clickable card -> navigates to its category
-      return `
-        <button class="zoom-card rounded-xl overflow-hidden shadow-sm focusable" data-route="portfolio:${item.key}" aria-label="Open ${item.key}">
-          <img src="${item.src}" alt="${alt}" class="w-full h-44 sm:h-48 lg:h-52 object-cover" loading="lazy"/>
-        </button>
-      `;
-    }
-
-    function ImageFigure(src, alt = 'Gallery image') {
-      // non-clickable figure (used inside category gallery)
-      return `
-        <figure class="zoom-card rounded-xl overflow-hidden shadow-sm">
-          <img src="${src}" alt="${alt}" class="w-full h-44 sm:h-48 lg:h-52 object-cover" loading="lazy"/>
-        </figure>
-      `;
-    }
-
-    function mixedGrid(n = 12) {
-      // Take images across categories for the home grid
-      const pool = allPhotosWithCat();
-      return pool.slice(0, n).map((item,i)=>ImageCardHome(item, `Recent photo ${i+1}`)).join('');
-    }
-
-    function CategoryCard(cat) {
-      const cover = (CAT_IMAGES[cat.key] || [])[0] || 'assets/placeholder.jpg';
-      return `
-        <button class="relative rounded-2xl overflow-hidden shadow hover:shadow-md transition focusable group" data-route="portfolio:${cat.key}" aria-label="Open ${cat.label}">
-          <img src="${cover}" alt="${cat.label}" class="w-full h-56 object-cover group-hover:scale-105 transition duration-500"/>
-          <div class="absolute inset-0 bg-black/30"></div>
-          <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
-            <h3 class="text-lg font-semibold">${cat.label}</h3>
-            <p class="text-xs text-white/80">Tap to view gallery</p>
-          </div>
-        </button>
-      `;
-    }
-
-    // ---------- Mount / Render ----------
-    function render() {
-      if (route === 'home') app.innerHTML = HomeView();
-      else if (route.startsWith('portfolio:')) app.innerHTML = PortfolioCategoryView(route.split(':')[1]);
-      else if (route === 'portfolio') app.innerHTML = PortfolioRootView();
-      else if (route === 'about') app.innerHTML = AboutView();
-      else if (route === 'contact') app.innerHTML = ContactView();
-      else app.innerHTML = HomeView();
-
-      initCarousels();
-      initContactForm();
-      if (route === 'about') initCounters(); // start count-up animation on About only
-
-      // set address text + links in footer and contact
-      const footerAddr = document.getElementById('footerAddressLink');
-      if (footerAddr) {
-        footerAddr.textContent = ADDRESS_TEXT;
-        footerAddr.href = MAP_DIRECTIONS_URL;
-      }
-      const contactAddr = document.getElementById('contactAddressText');
-      if (contactAddr) {
-        contactAddr.textContent = ADDRESS_TEXT;
-      }
-    }
-
-    // ---------- Carousel Logic ----------
+    // ====== CAROUSEL BEHAVIOR ======
     const carouselStates = new Map();
 
     function initCarousels() {
-      // Clear previous timers
-      carouselStates.forEach(st => clearInterval(st.timer));
-      carouselStates.clear();
-
-      document.querySelectorAll('[data-carousel]').forEach(el => {
-        const dotsWrap = el.querySelector('[data-dots]');
+      document.querySelectorAll('.carousel').forEach((el, index) => {
         const slides = Array.from(el.querySelectorAll('.carousel-slide'));
-        const interval = parseInt(el.getAttribute('data-interval')||'3500', 10);
-        const id = el.getAttribute('data-id') || Math.random().toString(36).slice(2);
-        let idx = 0;
+        const dotsWrap = el.querySelector('[data-dots]');
+        const btnPrev = el.querySelector('.prev');
+        const btnNext = el.querySelector('.next');
+        const interval = parseInt(el.getAttribute('data-interval') || '3500', 10);
+        if (!slides.length) return;
 
-        function setActive(newIdx){
-          slides[idx].classList.remove('active');
-          dotsWrap?.children[idx]?.classList.remove('ring-2','ring-white');
-          idx = (newIdx + slides.length) % slides.length;
-          slides[idx].classList.add('active');
-          dotsWrap?.children[idx]?.classList.add('ring-2','ring-white');
+        // Build dots
+        if (dotsWrap) {
+          dotsWrap.innerHTML = '';
+          slides.forEach((_, i) => {
+            const b = document.createElement('button');
+            b.className = 'w-2.5 h-2.5 rounded-full bg-white/60';
+            b.setAttribute('aria-label', `Go to slide ${i+1}`);
+            b.addEventListener('click', () => setActive(i));
+            dotsWrap.appendChild(b);
+          });
         }
 
-        const next = () => setActive(idx+1);
-        const prev = () => setActive(idx-1);
+        let idx = slides.findIndex(s => s.classList.contains('active'));
+        if (idx < 0) idx = 0;
+
+        function setActive(newIdx) {
+          slides[idx].classList.remove('active');
+          idx = (newIdx + slides.length) % slides.length;
+          slides[idx].classList.add('active');
+          if (dotsWrap) {
+            Array.from(dotsWrap.children).forEach(d => d.classList.remove('ring-2','ring-white'));
+            dotsWrap.children[idx]?.classList.add('ring-2','ring-white');
+          }
+        }
+
+        const next = () => setActive(idx + 1);
+        const prev = () => setActive(idx - 1);
+
+        btnNext?.addEventListener('click', () => { next(); restart(); });
+        btnPrev?.addEventListener('click', () => { prev(); restart(); });
 
         const timer = setInterval(next, interval);
-        carouselStates.set(id, { timer });
+        carouselStates.set(index, { timer });
 
-        el.querySelector('.next')?.addEventListener('click', () => { next(); restart(); });
-        el.querySelector('.prev')?.addEventListener('click', () => { prev(); restart(); });
+        function restart() {
+          clearInterval(carouselStates.get(index)?.timer);
+          carouselStates.set(index, { timer: setInterval(next, interval) });
+        }
 
-        dotsWrap?.querySelectorAll('[data-dot]')?.forEach(dot => {
-          dot.addEventListener('click', () => { setActive(parseInt(dot.getAttribute('data-dot'))); restart(); });
-        });
-
-        function restart(){ clearInterval(timer); carouselStates.set(id, { timer: setInterval(next, interval) }); }
+        if (dotsWrap && dotsWrap.children[0]) {
+          dotsWrap.children[0].classList.add('ring-2','ring-white');
+        }
       });
     }
 
-    // ---------- Count-up Animation ----------
-    function initCounters() {
+    let countersStarted = false;
+    function startCounters() {
+      if (countersStarted) return;
+      countersStarted = true;
+
       const els = document.querySelectorAll('.countup');
       els.forEach(el => {
-        if (el.dataset.countStarted === 'true') return;
-        el.dataset.countStarted = 'true';
-
-        const target = parseInt(el.getAttribute('data-count-target'), 10) || 0;
-        const duration = parseInt(el.getAttribute('data-count-duration'), 10) || 2000; // ms
+        const target = parseInt(el.getAttribute('data-count-target') || '0', 10);
+        const duration = parseInt(el.getAttribute('data-count-duration') || '2000', 10);
         const startTime = performance.now();
 
         function tick(now) {
           const progress = Math.min((now - startTime) / duration, 1);
-          const value = Math.floor(progress * target);
-          el.textContent = value.toString();
+          el.textContent = Math.floor(progress * target).toString();
           if (progress < 1) requestAnimationFrame(tick);
           else el.textContent = target.toString();
         }
+
         el.textContent = '0';
         requestAnimationFrame(tick);
       });
     }
 
-    // ---------- Contact handler ----------
-    function initContactForm(){
-      const form = document.getElementById('contactForm');
-      if(!form) return;
+    // ====== CONTACT FORM (mailto / whatsapp) ======
+    const form = document.getElementById('contactForm');
+    if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const fd = new FormData(form);
         const name = fd.get('name');
         const phone = fd.get('phone');
         const email = fd.get('email');
-        const wantEmail = fd.get('notifyEmail') !== null; // checkbox present when checked
+        const wantEmail = fd.get('notifyEmail') !== null;
         const wantWA = fd.get('notifyWhatsApp') !== null;
 
         const msg = `New inquiry from ${name}\nPhone: ${phone}\nEmail: ${email}`;
@@ -589,7 +604,7 @@
         }
 
         if (wantEmail) {
-          const mail = `mailto:test@gmail.com?subject=${encodeURIComponent('New Inquiry from '+name)}&body=${encodeURIComponent(msg)}`;
+          const mail = `mailto:test@gmail.com?subject=${encodeURIComponent('New Inquiry from ' + name)}&body=${encodeURIComponent(msg)}`;
           window.open(mail, '_blank');
         }
         if (wantWA) {
@@ -602,10 +617,57 @@
       });
     }
 
-    // Init
-    document.getElementById('year').textContent = new Date().getFullYear();
-    render();
+    // ====== BUILD PAGE CONTENT FROM IMAGE LISTS ======
+    function buildAllContent() {
+      const heroTrack = document.getElementById('homeHeroTrack');
+      if (heroTrack) {
+        heroTrack.innerHTML = '';
+        CATS.forEach((c, i) => {
+          const paths = fullPaths(c.key);
+          if (!paths.length) return;
+          const slide = createSlide(paths[0], `portfolio-${c.key}`);
+          if (i === 0) slide.classList.add('active');
+          heroTrack.appendChild(slide);
+        });
+      }
+
+      const recentGrid = document.getElementById('recentGrid');
+      if (recentGrid) {
+        recentGrid.innerHTML = '';
+        CATS.forEach(c => {
+          const paths = fullPaths(c.key).slice(0, 2);
+          paths.forEach((src, i) => {
+            recentGrid.appendChild(createThumb(src, `portfolio-${c.key}`, `${c.label} recent ${i+1}`));
+          });
+        });
+      }
+
+      const cardsWrap = document.getElementById('portfolioCards');
+      if (cardsWrap) {
+        cardsWrap.innerHTML = '';
+        CATS.forEach(c => {
+          const cover = fullPaths(c.key)[0] || 'assets/about.jpg';
+          cardsWrap.appendChild(createCategoryCard(c, cover));
+        });
+      }
+
+      CATS.forEach(c => {
+        const all = fullPaths(c.key);
+        const first3 = all.slice(0, 3);
+
+        const carTrack = document.getElementById(`carouselTrack-${c.key}`);
+        if (carTrack) fillCarousel(carTrack, first3, `portfolio-${c.key}`);
+
+        const grid = document.getElementById(`gallery-${c.key}`);
+        if (grid) fillGallery(grid, all, c.label);
+      });
+
+      initCarousels();
+    }
+
+    buildAllContent();
+
+    showPage('home');
   </script>
 </body>
 </html>
-
